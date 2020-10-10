@@ -7,6 +7,7 @@
     { root: false, childrenTags: [], tagName: 'American', items: ['1000'], id: '102' },
   ];
 
+
   function insertItem(itemID = null, tagID = null) {
     // check for valid itemID and tagID
     if (itemID === null) throw new Error('Null itemID');
@@ -16,12 +17,13 @@
 
     const stack = [];
     let tag = getTagByID(tagID);
+
     stack.push(tag);
 
     while (stack.length > 0) {
       const top = stack.pop();
       top.items.push(itemID);
-      newItemTags.push(top.tagName);
+      newItemTags.push(top.id);
 
       updateTag(top.id, top.items);
 
@@ -34,6 +36,7 @@
     updateItemsArray(newItem);
 
     console.log('success');
+    printTags();
   }
 
   // the function that updates items array for tag with ID of tagID
@@ -54,6 +57,16 @@
   // the function that retrieves tag information using tagID
   // this function should be provided by user
   function getTagByID(tagID) {
-    Tags.filter((tag) => tag.id === tagID)[0];
+    return Tags.filter((tag) => tag.id === tagID)[0];
   }
+
+  function printTags(){
+    console.log(Tags);
+    console.log(Items);
+  }
+
+
+  // TESTING
+  // insertItem('1001', '100');
+
 }
