@@ -21,6 +21,7 @@
 
     stack.push(tag);
 
+    // Traversing tags tree
     while (stack.length > 0) {
       const top = stack.pop();
       top.items.push(itemID);
@@ -34,7 +35,7 @@
     }
 
     const newItem = { tags: newItemTags, id: itemID };
-    updateItemsArray(newItem);
+    addItemToDatabase(newItem);
   }
 
   // the function that updates properties for tag with ID of tagID
@@ -54,14 +55,20 @@
     }
   }
 
-  function updateItemsArray(item) {
+  // insert new item to database
+  function addItemToDatabase(item) {
     Items.push(item);
   }
 
-  // the function that retrieves tag information using tagID
+  // insert new tag to database
+  function addTagToDatabase(tag) {
+    Tags.push(tag);
+  }
+
+  // the function that retrieves tag information using id
   // this function should be provided by user
-  function getTagByID(tagID) {
-    return Tags.filter((tag) => tag.id === tagID)[0];
+  function getTagByID(id) {
+    return Tags.filter((tag) => tag.id === id)[0];
   }
 
   function getRoot() {
@@ -80,7 +87,7 @@
     if (root) {
       const root = getRoot();
       updateTag(root.id, { root: false });
-      Tags.push({
+      addTagToDatabase({
         root: true,
         childrenTags: [root.id],
         tagName: tagName,
@@ -90,7 +97,7 @@
     } else {
       const attachTag = getTagByID(attachToID);
       updateTag(attachToID, { childrenTags: attachTag.childrenTags.push(tagID) });
-      Tags.push({
+      addTagToDatabase({
         root: false,
         childrenTags: [],
         tagName: tagName,
@@ -101,7 +108,6 @@
   }
 
   // TESTING
-
   // insertItem('1001', '100');
   // insertTag('Cinema', '104', null, true);
   // printTags();
