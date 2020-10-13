@@ -1,3 +1,5 @@
+const Tagger = require('./Tagger');
+
 const Items = [{ tags: ['100', '101', '102'], id: '1000' }];
 
 const Tags = [
@@ -48,9 +50,9 @@ function printTags() {
   console.dirxml(Items);
 }
 
-// const tagger = new Tagger(addItemToDatabase, addTagToDatabase, getTagByID, updateTag, getRoot);
+const tagger = new Tagger(addItemToDatabase, addTagToDatabase, getTagByID, updateTag, getRoot);
 
 // TESTING
-// insertItem('1001', '100');
-// insertTag('Cinema', '104', null, true);
-// printTags();
+tagger.insertItem('1001', '100');
+insertTag('Cinema', '104', null, true);
+printTags();
