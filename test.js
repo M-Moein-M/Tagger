@@ -54,5 +54,5 @@ const tagger = new Tagger(addItemToDatabase, addTagToDatabase, getTagByID, updat
 
 // TESTING
 tagger.insertItem('1001', '100');
-insertTag('Cinema', '104', null, true);
+tagger.insertTag('Cinema', '104', null, true);
 printTags();
