@@ -45,14 +45,9 @@ function getRoot() {
   return Tags.filter((tag) => tag.root)[0];
 }
 
-function printTags() {
-  console.dirxml(Tags);
-  console.dirxml(Items);
-}
-
 const tagger = new Tagger(addItemToDatabase, addTagToDatabase, getTagByID, updateTag, getRoot);
 
 // TESTING
-tagger.insertItem('1001', '100');
-tagger.insertTag('Cinema', '104', null, true);
-printTags();
+// tagger.insertItem('1001', '100');
+// tagger.insertTag('Cinema', '104', null, true);
+// tagger.printTags();
