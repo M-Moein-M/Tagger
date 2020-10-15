@@ -1,5 +1,29 @@
 class Tagger {
   constructor(addItemToDatabase, addTagToDatabase, getTagByID, updateTag, getRoot) {
+    // printing tags
+    this.printTags = function () {
+      let currentNode = getRoot();
+      let currentLevel = 0;
+
+      let queue = [];
+      queue.push(Object.assign(currentNode, { nodeLevel: currentLevel }));
+
+      while (queue.length > 0) {
+        currentNode = queue.shift();
+        if (currentNode.nodeLevel === currentLevel + 1) {
+          console.log('\n');
+          currentLevel++;
+        }
+        process.stdout.write(currentNode.tagName + '\t');
+        // console.log(currentNode.tagName);
+
+        for (let i = 0; i < currentNode.childrenTags.length; i++) {
+          let child = getTagByID(currentNode.childrenTags[i]);
+          queue.push(Object.assign(child, { nodeLevel: currentLevel + 1 }));
+        }
+      }
+    };
+
     // handling item insertion
     this.insertItem = function (itemID = null, tagID = null) {
       // check for valid itemID and tagID
