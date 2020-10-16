@@ -1,8 +1,8 @@
 class Tagger {
-  constructor(addItemToDatabase, addTagToDatabase, getTagByID, updateTag, getRoot) {
+  constructor(addItemToDatabase, addTagToDatabase, updateTag, getTag, tagUniqueIdentifier, itemUniqueIdentifier) {
     // printing tags
     this.printTags = function () {
-      let currentNode = getRoot();
+      let currentNode = getTag('root', true);
       let currentLevel = 0;
 
       let queue = [];
@@ -18,10 +18,12 @@ class Tagger {
         // console.log(currentNode.tagName);
 
         for (let i = 0; i < currentNode.childrenTags.length; i++) {
-          let child = getTagByID(currentNode.childrenTags[i]);
+          let child = getTag(tagUniqueIdentifier, currentNode.childrenTags[i]);
           queue.push(Object.assign(child, { nodeLevel: currentLevel + 1 }));
         }
       }
+
+      console.log('\n- - - - - - - - - - - - - - -\n');
     };
 
     // handling item insertion
@@ -33,7 +35,7 @@ class Tagger {
       const newItemTags = [];
 
       const stack = [];
-      let tag = getTagByID(tagID);
+      let tag = getTag(tagUniqueIdentifier, tagID);
 
       stack.push(tag);
 
@@ -41,12 +43,12 @@ class Tagger {
       while (stack.length > 0) {
         const top = stack.pop();
         top.items.push(itemID);
-        newItemTags.push(top.id);
+        newItemTags.push(top[tagUniqueIdentifier]); // push tag id
 
-        updateTag(top.id, { items: top.items });
+        updateTag(top[tagUniqueIdentifier], { items: top.items });
 
         for (let i = 0; i < top.childrenTags.length; i++) {
-          stack.push(getTagByID(top.childrenTags[i]));
+          stack.push(getTag(tagUniqueIdentifier, top.childrenTags[i]));
         }
       }
 
@@ -58,17 +60,17 @@ class Tagger {
     // inserting new tag, if root is true then new tag will be the parent of the current root
     this.insertTag = function (tagName = null, tagID = null, attachToID = null, root = false) {
       if (root) {
-        const root = getRoot();
-        updateTag(root.id, { root: false });
+        const root = getTag('root', true);
+        updateTag(root[tagUniqueIdentifier], { root: false });
         addTagToDatabase({
           root: true,
-          childrenTags: [root.id],
+          childrenTags: [root[tagUniqueIdentifier]],
           tagName: tagName,
           items: [...root.items],
           id: tagID,
         });
       } else {
-        const attachTag = getTagByID(attachToID);
+        const attachTag = getTag(tagUniqueIdentifier, attachToID);
         updateTag(attachToID, { childrenTags: attachTag.childrenTags.push(tagID) });
         addTagToDatabase({
           root: false,
