@@ -41,13 +41,20 @@ function getTagByID(id) {
   return Tags.filter((tag) => tag.id === id)[0];
 }
 
+function getTag(property, value) {
+  if (property === 'root') return getRoot();
+  else if (property === 'id') return getTagByID(value);
+  else console.log(`No property such as ${property}`);
+}
+
 function getRoot() {
   return Tags.filter((tag) => tag.root)[0];
 }
 
-const tagger = new Tagger(addItemToDatabase, addTagToDatabase, getTagByID, updateTag, getRoot);
+const tagger = new Tagger(addItemToDatabase, addTagToDatabase, updateTag, getTag, 'id', 'id');
 
 // TESTING
-// tagger.insertItem('1001', '100');
-// tagger.insertTag('Cinema', '104', null, true);
-// tagger.printTags();
+tagger.printTags();
+tagger.insertItem('1001', '100');
+tagger.insertTag('Cinema', '104', null, true);
+tagger.printTags();
