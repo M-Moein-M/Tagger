@@ -87,19 +87,24 @@ class Tagger {
     };
 
     function getTag(cluster, property, value) {
-      if (property === 'root') return getRoot(cluster);
-      else if (property === 'id') return getTagByID(value);
+      if (property === 'root' && value === true) {
+        const root = getRoot(cluster);
+        return root;
+      } else if (property === 'id') return getTagByID(value);
       else console.log(`No property such as ${property}`);
     }
 
     function getTagByID(id) {
-      const tag = cluster.Tags.find((t) => t[tagUniqueIdentifier] === id)[0];
+      const tag = cluster.Tags.find((t) => t[tagUniqueIdentifier] === id);
       return root;
     }
 
     function getRoot(cluster) {
-      const root = cluster.Tags.find((t) => t.root)[0];
-      return root;
+      const root = cluster.Tags.find((t) => t.root);
+      // if there's no root(if the cluster is empty or just initialized)
+      if (!root) return null;
+      // return root
+      else return root;
     }
 
     function updateTag(cluster, tagID, valueChange, reloadDatabase = true) {
@@ -124,13 +129,15 @@ class Tagger {
         // get root of the cluster
         const root = getTag(cluster, 'root', true);
 
-        updateTag(cluster, root[tagUniqueIdentifier], { root: false }, false);
+        // if root was found
+        if (root) updateTag(cluster, root[tagUniqueIdentifier], { root: false }, false);
 
+        // insert new root
         insertNewTag(cluster, {
           root: true,
-          childrenTags: [root[tagUniqueIdentifier]],
+          childrenTags: root ? [root[tagUniqueIdentifier]] : [],
           tagName: tagName,
-          items: [...root.items],
+          items: root ? [...root.items] : [],
           id: tagID,
         });
       } else {
