@@ -1,60 +1,34 @@
 const Tagger = require('./Tagger');
 
-const Items = [{ tags: ['100', '101', '102'], id: '1000' }];
+const database = [];
 
-const Tags = [
-  { root: true, childrenTags: ['101', '102'], tagName: 'Movies', items: ['1000'], id: '100' },
-  { root: false, childrenTags: [], tagName: 'Drama', items: ['1000'], id: '101' },
-  { root: false, childrenTags: [], tagName: 'American', items: ['1000'], id: '102' },
-];
-
-// the function that updates properties for tag with ID of tagID
-// this function should be provided bu user
-// changedValues is an object of the keys and values to change e.g. {items: newItems, id: '1231'}
-function updateTag(tagID = null, newValues = null) {
-  // check for valid tagID and newItems
-  if (newValues === null) throw new Error('Null newValues');
-  else if (tagID === null) throw new Error('Null TagID');
-
-  const index = Tags.findIndex((t) => t.id === tagID);
-  const newProperties = Object.keys(newValues);
-
-  for (let i = 0; i < newProperties.length; i++) {
-    const property = newProperties[i];
-    Tags[index][property] = newValues[property];
-  }
+// insert new document to database
+function insertDoc(doc) {
+  database.push(doc);
 }
 
-// insert new item to database
-function addItemToDatabase(item) {
-  Items.push(item);
+function updateDoc(id, cluster) {
+  const docIndex = getDocIndex(id);
+  database.splice(docIndex, 1);
+  database.push(cluster);
 }
 
-// insert new tag to database
-function addTagToDatabase(tag) {
-  Tags.push(tag);
+function getDocByID(id) {
+  const index = getDocIndex(id);
+  return database[index];
 }
 
-// the function that retrieves tag information using id
-// this function should be provided by user
-function getTagByID(id) {
-  return Tags.filter((tag) => tag.id === id)[0];
+function getDocIndex(id) {
+  const index = database.findIndex((doc) => doc.clusterID === id);
+  return index;
 }
 
-function getTag(property, value) {
-  if (property === 'root') return getRoot();
-  else if (property === 'id') return getTagByID(value);
-  else console.log(`No property such as ${property}`);
-}
-
-function getRoot() {
-  return Tags.filter((tag) => tag.root)[0];
-}
-
-const tagger = new Tagger(addItemToDatabase, addTagToDatabase, updateTag, getTag, 'id', 'id');
+const tagger = new Tagger(insertDoc, updateDoc, getDocByID, 'id', 'id');
 
 // TESTING
-tagger.printTags();
-tagger.insertItem('1001', '100');
-tagger.insertTag('Cinema', '104', null, true);
-tagger.printTags();
+tagger.createNewCluster('rt64q57scg0');
+tagger.insertTag(database[0].clusterID, 'Movies', '100', null, true);
+tagger.insertItem(database[0].clusterID, '1000', '100');
+tagger.insertTag(database[0].clusterID, 'Drama', '110', '100', false);
+console.dir(JSON.stringify(database));
+tagger.printTags(database[0].clusterID);
