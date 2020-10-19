@@ -27,10 +27,13 @@ class Tagger {
 
     // printing tags
     // refactor this ?????????????????????????
-    this.printTags = function () {
-      let currentNode = getTag('root', true);
+    this.printTags = function (clusterID) {
+      const cluster = getDocByID(clusterID);
+
+      let currentNode = getTag(cluster, 'root', true);
       let currentLevel = 0;
 
+      // using queue for traversing the tree level by level
       let queue = [];
       queue.push(Object.assign(currentNode, { nodeLevel: currentLevel }));
 
@@ -40,11 +43,12 @@ class Tagger {
           console.log('\n');
           currentLevel++;
         }
+
+        // avoid new line at the end of console logging
         process.stdout.write(currentNode.tagName + '\t');
-        // console.log(currentNode.tagName);
 
         for (let i = 0; i < currentNode.childrenTags.length; i++) {
-          let child = getTag(tagUniqueIdentifier, currentNode.childrenTags[i]);
+          let child = getTag(cluster, tagUniqueIdentifier, currentNode.childrenTags[i]);
           queue.push(Object.assign(child, { nodeLevel: currentLevel + 1 }));
         }
       }
@@ -148,7 +152,9 @@ class Tagger {
           throw new Error('No tag was found with requested id. Aborting inserting tag');
         }
 
-        updateTag(cluster, attachToID, { childrenTags: attachTag.childrenTags.push(tagID) });
+        // insert new children tag
+        attachTag.childrenTags.push(tagID);
+        updateTag(cluster, attachToID, { childrenTags: attachTag.childrenTags }, false);
 
         insertNewTag(cluster, {
           root: false,
