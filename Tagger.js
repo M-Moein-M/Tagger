@@ -26,6 +26,7 @@ class Tagger {
     }
 
     // printing tags
+    // refactor this ?????????????????????????
     this.printTags = function () {
       let currentNode = getTag('root', true);
       let currentLevel = 0;
@@ -86,17 +87,25 @@ class Tagger {
       updateDoc(cluster.clusterID, cluster);
     };
 
+    function updateTag(cluster, tagID, valueChange, reloadDatabase = true) {
+      const index = cluster.Tags.findIndex((t) => t[tagUniqueIdentifier] === tagID);
+      for (let attribute in valueChange) {
+        cluster.Tags[index][attribute] = valueChange[attribute];
+      }
+      if (reloadDatabase) updateDoc(cluster.clusterID, cluster);
+    }
+
     function getTag(cluster, property, value) {
       if (property === 'root' && value === true) {
         const root = getRoot(cluster);
         return root;
-      } else if (property === 'id') return getTagByID(value);
+      } else if (property === 'id') return getTagByID(cluster, value);
       else console.log(`No property such as ${property}`);
     }
 
-    function getTagByID(id) {
+    function getTagByID(cluster, id) {
       const tag = cluster.Tags.find((t) => t[tagUniqueIdentifier] === id);
-      return root;
+      return tag;
     }
 
     function getRoot(cluster) {
@@ -105,14 +114,6 @@ class Tagger {
       if (!root) return null;
       // return root
       else return root;
-    }
-
-    function updateTag(cluster, tagID, valueChange, reloadDatabase = true) {
-      const index = cluster.Tags.findIndex((t) => t[tagUniqueIdentifier] === tagID);
-      for (attribute in valueChange) {
-        cluster.Tags[index][attribute] = valueChange[attribute];
-      }
-      if (reloadDatabase) updateDoc(cluster.clusterID, cluster);
     }
 
     // insert new tag to cluster
@@ -141,9 +142,15 @@ class Tagger {
           id: tagID,
         });
       } else {
+        // retrieve the tag that we want to append to
         const attachTag = getTag(cluster, tagUniqueIdentifier, attachToID);
-        updateTag(cluster, attachToID[tagUniqueIdentifier], { childrenTags: attachTag.childrenTags.push(tagID) });
-        insertNewTag({
+        if (!attachTag) {
+          throw new Error('No tag was found with requested id. Aborting inserting tag');
+        }
+
+        updateTag(cluster, attachToID, { childrenTags: attachTag.childrenTags.push(tagID) });
+
+        insertNewTag(cluster, {
           root: false,
           childrenTags: [],
           tagName: tagName,
