@@ -112,22 +112,22 @@ class Tagger {
 
       // throw error if requested property is invalid
       throw new Error(`No property such as ${property}`);
-    }
 
-    // return tag with required identifier
-    function getTagByID(cluster, id) {
-      // finding tag
-      const tag = cluster.Tags.find((t) => t[tagUniqueIdentifier] === id);
-      return tag;
-    }
+      // return tag with required identifier
+      function getTagByID(cluster, id) {
+        // finding tag
+        const tag = cluster.Tags.find((t) => t[tagUniqueIdentifier] === id);
+        return tag;
+      }
 
-    // return root of the given cluster
-    function getRoot(cluster) {
-      const root = cluster.Tags.find((t) => t.root);
-      // if there's no root(if the cluster is empty or just initialized)
-      if (!root) return null;
-      // return root
-      else return root;
+      // return root of the given cluster
+      function getRoot(cluster) {
+        const root = cluster.Tags.find((t) => t.root);
+        // if there's no root(if the cluster is empty or just initialized)
+        if (!root) return null;
+        // return root
+        else return root;
+      }
     }
 
     // insert new tag to cluster
@@ -175,6 +175,38 @@ class Tagger {
           id: tagID,
         });
       }
+    };
+
+    // return requested item with same identifier as itemID
+    function getItemIndex(cluster, itemID) {
+      const index = cluster.findIndex((i) => i[itemUniqueIdentifier] === itemID);
+      return index;
+    }
+
+    this.deleteItem = async function (clusterID, itemID) {
+      const cluster = getDocByID(clusterID);
+      const itemIndex = getItemIndex(cluster, itemID);
+
+      // no match for itemID
+      if (itemIndex < 0) return;
+
+      const item = cluster.Items[itemIndex];
+
+      // remove itemID from all the tags
+      for (let i = 0; i < item.tags.length; i++) {
+        const tagID = item.tags[i];
+        const tag = getTag(cluster, tagUniqueIdentifier, tagID);
+        const itemIndex = tag.items.findIndex((i) => i === itemID);
+        tag.items.splice(itemIndex, 1);
+
+        updateTag(cluster, tagID, { items: tag.items }, false);
+      }
+
+      // remove item from cluster items list
+      cluster.Items.splice(itemIndex, 1);
+
+      // update changed cluster
+      updateDoc(cluster.clusterID, cluster);
     };
   }
 }
