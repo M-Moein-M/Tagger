@@ -26,12 +26,11 @@ class Tagger {
     }
 
     // printing tags
-    // refactor this ?????????????????????????
     this.printTags = function (clusterID) {
       const cluster = getDocByID(clusterID);
 
       let currentNode = getTag(cluster, 'root', true);
-      let currentLevel = 0;
+      let currentLevel = 0; // to keep track of which level are we printing ATM. Used for better looking output
 
       // using queue for traversing the tree level by level
       let queue = [];
@@ -91,6 +90,7 @@ class Tagger {
       updateDoc(cluster.clusterID, cluster);
     };
 
+    // change the tag properties according to valueChange input and save to database
     function updateTag(cluster, tagID, valueChange, reloadDatabase = true) {
       const index = cluster.Tags.findIndex((t) => t[tagUniqueIdentifier] === tagID);
       for (let attribute in valueChange) {
@@ -99,19 +99,29 @@ class Tagger {
       if (reloadDatabase) updateDoc(cluster.clusterID, cluster);
     }
 
+    // return tag. Tag can be asked with the identifier or it can be the root tag
     function getTag(cluster, property, value) {
+      // return root of the cluster
       if (property === 'root' && value === true) {
         const root = getRoot(cluster);
         return root;
-      } else if (property === 'id') return getTagByID(cluster, value);
-      else console.log(`No property such as ${property}`);
+      }
+
+      // return tag matching given identifier
+      if (property === 'id') return getTagByID(cluster, value);
+
+      // throw error if requested property is invalid
+      throw new Error(`No property such as ${property}`);
     }
 
+    // return tag with required identifier
     function getTagByID(cluster, id) {
+      // finding tag
       const tag = cluster.Tags.find((t) => t[tagUniqueIdentifier] === id);
       return tag;
     }
 
+    // return root of the given cluster
     function getRoot(cluster) {
       const root = cluster.Tags.find((t) => t.root);
       // if there's no root(if the cluster is empty or just initialized)
@@ -121,7 +131,7 @@ class Tagger {
     }
 
     // insert new tag to cluster
-    function insertNewTag(cluster, newTag) {
+    function saveNewTag(cluster, newTag) {
       cluster.Tags.push(newTag);
       updateDoc(cluster.clusterID, cluster);
     }
@@ -137,8 +147,8 @@ class Tagger {
         // if root was found
         if (root) updateTag(cluster, root[tagUniqueIdentifier], { root: false }, false);
 
-        // insert new root
-        insertNewTag(cluster, {
+        // insert new root. No need to refresh the database since we do it in saveNewTag couple of lines below
+        saveNewTag(cluster, {
           root: true,
           childrenTags: root ? [root[tagUniqueIdentifier]] : [],
           tagName: tagName,
@@ -152,11 +162,12 @@ class Tagger {
           throw new Error('No tag was found with requested id. Aborting inserting tag');
         }
 
-        // insert new children tag
+        // insert new children tag. No need to refresh the database since we do it in saveNewTag couple of lines below
         attachTag.childrenTags.push(tagID);
         updateTag(cluster, attachToID, { childrenTags: attachTag.childrenTags }, false);
 
-        insertNewTag(cluster, {
+        // save new tag to cluster
+        saveNewTag(cluster, {
           root: false,
           childrenTags: [],
           tagName: tagName,
