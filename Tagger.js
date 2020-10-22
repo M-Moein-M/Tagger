@@ -179,7 +179,7 @@ class Tagger {
 
     // return requested item with same identifier as itemID
     function getItemIndex(cluster, itemID) {
-      const index = cluster.findIndex((i) => i[itemUniqueIdentifier] === itemID);
+      const index = cluster.Items.findIndex((i) => i[itemUniqueIdentifier] === itemID);
       return index;
     }
 
@@ -208,6 +208,37 @@ class Tagger {
       // update changed cluster
       updateDoc(cluster.clusterID, cluster);
     };
+
+    this.deleteTag = async function (clusterID, tagID) {
+      const cluster = getDocByID(clusterID);
+
+      // remove the tag from the cluster tags list
+      const tagIndex = cluster.Tags.findIndex((t) => t[tagUniqueIdentifier] === tagID);
+      const removeTags = []; // removing one tag will result in removing all of its child tags
+
+      // for traversing the tag tree
+      const stack = [];
+
+      stack.push(tagID);
+
+      while (stack.length > 0) {
+        const id = stack.pop();
+        const tag = getTag(cluster, tagUniqueIdentifier, id);
+
+        // insert to the list to remove after this while loop
+        removeTags.push(tag[tagUniqueIdentifier]);
+
+        // add the children tags to the stack
+        stack = stack.concat(tag.childrenTags);
+      }
+
+      // delete all the tags and items related to tagID
+      removeTags(cluster, removeTags);
+    };
+
+    function removeTags(cluster, tagsList) {
+      // remove tags from cluster.Tags and remove tags from items tags list
+    }
   }
 }
 
