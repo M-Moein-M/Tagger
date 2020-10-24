@@ -32,6 +32,12 @@ class Tagger {
       let currentNode = getTag(cluster, 'root', true);
       let currentLevel = 0; // to keep track of which level are we printing ATM. Used for better looking output
 
+      // incase of printing empty cluster
+      if (!currentNode) {
+        console.log('There is no tag in the cluster');
+        return;
+      }
+
       // using queue for traversing the tree level by level
       let queue = [];
       queue.push(Object.assign(currentNode, { nodeLevel: currentLevel }));
