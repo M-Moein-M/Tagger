@@ -214,10 +214,24 @@ class Tagger {
 
       // remove the tag from the cluster tags list
       const tagIndex = cluster.Tags.findIndex((t) => t[tagUniqueIdentifier] === tagID);
+
+      // incase of removing root
+      if (cluster.Tags[tagIndex].root) {
+        // remove all the tags
+        cluster.Tags = [];
+
+        // clear all the tags from items
+        for (let i = 0; i < cluster.Items.length; i++) {
+          cluster.Items[i].tags = [];
+        }
+
+        return;
+      }
+
       const removeTags = []; // removing one tag will result in removing all of its child tags
 
       // for traversing the tag tree
-      const stack = [];
+      let stack = [];
 
       stack.push(tagID);
 
@@ -233,11 +247,50 @@ class Tagger {
       }
 
       // delete all the tags and items related to tagID
-      removeTags(cluster, removeTags);
+      await clearTags(cluster, removeTags);
+
+      updateDoc(cluster.clusterID, cluster);
     };
 
-    function removeTags(cluster, tagsList) {
-      // remove tags from cluster.Tags and remove tags from items tags list
+    // updates cluster so that all the references to tagsList is gone
+    async function clearTags(cluster, tagsList) {
+      // remove tags from all the items that have some of the tagsList
+      for (let i = 0; i < cluster.Items.length; i++) {
+        let tagIndex;
+
+        // remove tags from item's tags
+        for (let t = 0; t < tagsList.length; t++) {
+          tagIndex = cluster.Items[i].tags.findIndex((tag) => tag === tagsList[t]);
+
+          // if tag wasn't in item's tag then continue to next tag
+          if (tagIndex === -1) {
+            continue;
+          } else {
+            // remove tag from item's tags
+            cluster.Items[i].tags.splice(tagIndex, 1);
+          }
+        }
+      }
+
+      // remove tags from the Tags
+      for (let i = 0; i < tagsList.length; i++) {
+        const tagIndex = cluster.Tags.findIndex((t) => t[tagUniqueIdentifier] === tagsList[i]);
+
+        cluster.Tags.splice(tagIndex, 1);
+      }
+
+      // find and update the parent of the deleting tag
+      for (let i = 0; i < tagsList.length; i++) {
+        // find parent
+        const index = cluster.Tags[i].childrenTags.findIndex((t) => t === tagsList[0]);
+        if (index < 0) {
+          continue;
+        } else {
+          // remove tag from parent tag
+          cluster.Tags[i].childrenTags.splice(index, 1);
+          break;
+        }
+      }
     }
   }
 }
