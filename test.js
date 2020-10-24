@@ -41,6 +41,10 @@ async function test() {
   //tagger.printTags(database[0].clusterID);
   await tagger.deleteItem(database[0].clusterID, '1001');
   console.log('- - - - - - - - - - \n', JSON.stringify(database));
+
+  tagger.printTags(database[0].clusterID);
+  await tagger.deleteTag(database[0].clusterID, '100');
+  tagger.printTags(database[0].clusterID);
 }
 
 test();
