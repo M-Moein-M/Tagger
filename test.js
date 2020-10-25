@@ -26,25 +26,25 @@ function getDocIndex(id) {
 // TESTING
 async function test() {
   const tagger = new Tagger(insertDoc, updateDoc, getDocByID, 'id', 'id');
-  tagger.createNewCluster('rt64q57scg0');
-  tagger.insertTag(database[0].clusterID, 'Movies', '100', null, true);
-  tagger.insertTag(database[0].clusterID, 'Drama', '110', '100', false);
-  tagger.insertTag(database[0].clusterID, 'Action', '105', '100', false);
-  tagger.insertTag(database[0].clusterID, 'Comedy', '103', '100', false);
-  tagger.insertTag(database[0].clusterID, 'American', '104', '103', false);
+  await tagger.createNewCluster('rt64q57scg0');
+  await tagger.insertTag(database[0].clusterID, 'Movies', '100', null, true);
+  await tagger.insertTag(database[0].clusterID, 'Drama', '110', '100', false);
+  await tagger.insertTag(database[0].clusterID, 'Action', '105', '100', false);
+  await tagger.insertTag(database[0].clusterID, 'Comedy', '103', '100', false);
+  await tagger.insertTag(database[0].clusterID, 'American', '104', '103', false);
 
-  tagger.insertItem(database[0].clusterID, '1000', '100');
-  tagger.insertItem(database[0].clusterID, '1001', '103');
-  tagger.insertItem(database[0].clusterID, '1002', '105');
+  await tagger.insertItem(database[0].clusterID, '1000', '100');
+  await tagger.insertItem(database[0].clusterID, '1001', '103');
+  await tagger.insertItem(database[0].clusterID, '1002', '105');
 
   console.log('- - - - - - - - - - \n', JSON.stringify(database));
   //tagger.printTags(database[0].clusterID);
   await tagger.deleteItem(database[0].clusterID, '1001');
   console.log('- - - - - - - - - - \n', JSON.stringify(database));
 
-  tagger.printTags(database[0].clusterID);
-  await tagger.deleteTag(database[0].clusterID, '100');
-  tagger.printTags(database[0].clusterID);
+  await tagger.printTags(database[0].clusterID);
+  await tagger.deleteTag(database[0].clusterID, '105');
+  await tagger.printTags(database[0].clusterID);
 }
 
 test();
