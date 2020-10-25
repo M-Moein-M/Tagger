@@ -1,6 +1,6 @@
 class Tagger {
   constructor(insertDoc, updateDoc, getDocByID, tagUniqueIdentifier = 'id', itemUniqueIdentifier = 'id') {
-    this.createNewCluster = function (clusterID) {
+    this.createNewCluster = async function (clusterID) {
       // generate new cluster id incase the user didn't provide any
       if (clusterID == undefined) {
         clusterID = generateClusterID();
@@ -12,7 +12,7 @@ class Tagger {
         clusterID: clusterID,
       };
 
-      insertDoc(cluster);
+      await insertDoc(cluster);
 
       return clusterID;
     };
@@ -26,8 +26,8 @@ class Tagger {
     }
 
     // printing tags
-    this.printTags = function (clusterID) {
-      const cluster = getDocByID(clusterID);
+    this.printTags = async function (clusterID) {
+      const cluster = await getDocByID(clusterID);
 
       let currentNode = getTag(cluster, 'root', true);
       let currentLevel = 0; // to keep track of which level are we printing ATM. Used for better looking output
@@ -62,7 +62,7 @@ class Tagger {
     };
 
     // handling item insertion
-    this.insertItem = function (clusterID = null, itemID = null, tagID = null) {
+    this.insertItem = async function (clusterID = null, itemID = null, tagID = null) {
       // check for valid itemID and tagID
       if (itemID === null) throw new Error('Null itemID');
       else if (tagID === null) throw new Error('Null TagID');
@@ -70,7 +70,7 @@ class Tagger {
 
       const newItemTags = [];
 
-      const cluster = getDocByID(clusterID);
+      const cluster = await getDocByID(clusterID);
       let tag = getTag(cluster, tagUniqueIdentifier, tagID);
 
       const stack = [];
@@ -93,16 +93,16 @@ class Tagger {
 
       const newItem = { tags: newItemTags, id: itemID };
       cluster.Items.push(newItem);
-      updateDoc(cluster.clusterID, cluster);
+      await updateDoc(cluster.clusterID, cluster);
     };
 
     // change the tag properties according to valueChange input and save to database
-    function updateTag(cluster, tagID, valueChange, reloadDatabase = true) {
+    async function updateTag(cluster, tagID, valueChange, reloadDatabase = true) {
       const index = cluster.Tags.findIndex((t) => t[tagUniqueIdentifier] === tagID);
       for (let attribute in valueChange) {
         cluster.Tags[index][attribute] = valueChange[attribute];
       }
-      if (reloadDatabase) updateDoc(cluster.clusterID, cluster);
+      if (reloadDatabase) await updateDoc(cluster.clusterID, cluster);
     }
 
     // return tag. Tag can be asked with the identifier or it can be the root tag
@@ -137,24 +137,24 @@ class Tagger {
     }
 
     // insert new tag to cluster
-    function saveNewTag(cluster, newTag) {
+    async function saveNewTag(cluster, newTag) {
       cluster.Tags.push(newTag);
-      updateDoc(cluster.clusterID, cluster);
+      await updateDoc(cluster.clusterID, cluster);
     }
 
     // handling tag insertion
     // inserting new tag, if root is true then new tag will be the parent of the current root
-    this.insertTag = function (clusterID, tagName = null, tagID = null, attachToID = null, root = false) {
-      const cluster = getDocByID(clusterID);
+    this.insertTag = async function (clusterID, tagName = null, tagID = null, attachToID = null, root = false) {
+      const cluster = await getDocByID(clusterID);
       if (root) {
         // get root of the cluster
         const root = getTag(cluster, 'root', true);
 
         // if root was found
-        if (root) updateTag(cluster, root[tagUniqueIdentifier], { root: false }, false);
+        if (root) await updateTag(cluster, root[tagUniqueIdentifier], { root: false }, false);
 
         // insert new root. No need to refresh the database since we do it in saveNewTag couple of lines below
-        saveNewTag(cluster, {
+        await saveNewTag(cluster, {
           root: true,
           childrenTags: root ? [root[tagUniqueIdentifier]] : [],
           tagName: tagName,
@@ -170,10 +170,10 @@ class Tagger {
 
         // insert new children tag. No need to refresh the database since we do it in saveNewTag couple of lines below
         attachTag.childrenTags.push(tagID);
-        updateTag(cluster, attachToID, { childrenTags: attachTag.childrenTags }, false);
+        await updateTag(cluster, attachToID, { childrenTags: attachTag.childrenTags }, false);
 
         // save new tag to cluster
-        saveNewTag(cluster, {
+        await saveNewTag(cluster, {
           root: false,
           childrenTags: [],
           tagName: tagName,
@@ -190,7 +190,7 @@ class Tagger {
     }
 
     this.deleteItem = async function (clusterID, itemID) {
-      const cluster = getDocByID(clusterID);
+      const cluster = await getDocByID(clusterID);
       const itemIndex = getItemIndex(cluster, itemID);
 
       // no match for itemID
@@ -205,18 +205,18 @@ class Tagger {
         const itemIndex = tag.items.findIndex((i) => i === itemID);
         tag.items.splice(itemIndex, 1);
 
-        updateTag(cluster, tagID, { items: tag.items }, false);
+        await updateTag(cluster, tagID, { items: tag.items }, false);
       }
 
       // remove item from cluster items list
       cluster.Items.splice(itemIndex, 1);
 
       // update changed cluster
-      updateDoc(cluster.clusterID, cluster);
+      await updateDoc(cluster.clusterID, cluster);
     };
 
     this.deleteTag = async function (clusterID, tagID) {
-      const cluster = getDocByID(clusterID);
+      const cluster = await getDocByID(clusterID);
 
       // remove the tag from the cluster tags list
       const tagIndex = cluster.Tags.findIndex((t) => t[tagUniqueIdentifier] === tagID);
@@ -254,8 +254,6 @@ class Tagger {
 
       // delete all the tags and items related to tagID
       await clearTags(cluster, removeTags);
-
-      updateDoc(cluster.clusterID, cluster);
     };
 
     // updates cluster so that all the references to tagsList is gone
@@ -297,6 +295,8 @@ class Tagger {
           break;
         }
       }
+
+      await updateDoc(cluster.clusterID, cluster);
     }
   }
 }
