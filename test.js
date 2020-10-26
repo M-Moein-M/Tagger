@@ -26,6 +26,11 @@ function getDocIndex(id) {
 // TESTING
 async function test() {
   const tagger = new Tagger(insertDoc, updateDoc, getDocByID, 'id', 'id');
+
+  tagger.on('error', (error, dsc) => {
+    console.log(dsc);
+  });
+
   await tagger.createNewCluster('rt64q57scg0');
   await tagger.insertTag(database[0].clusterID, 'Movies', '100', null, true);
   await tagger.insertTag(database[0].clusterID, 'Drama', '110', '100', false);
@@ -45,6 +50,9 @@ async function test() {
   await tagger.printTags(database[0].clusterID);
   await tagger.deleteTag(database[0].clusterID, '105');
   await tagger.printTags(database[0].clusterID);
+
+  // error testing
+  await tagger.insertItem(database[0].clusterID, '1002', 'unknownTag');
 }
 
 test();
