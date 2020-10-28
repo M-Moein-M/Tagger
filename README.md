@@ -34,6 +34,42 @@ function updateDoc(docID, document) {
 }
 ```
 
+- **getDocByID** (as the name implies)is the function which returns the document with the requested document(id). The docID is actually the clusterID for one of the clusters.
+
+```javascript
+function getDocByID(id) {
+  // your code which returns requested doc(cluster) that stored in database using the insertDoc function that was mentioned above.
+}
+```
+
+- **tagUniqueIdentifier** and **itemUniqueIdentifier** are just some namings for the how the identifiers will be saved in the cluster. If you want to use the clusters that Tagger saves in the database, this might be useful. The default values are 'id'. if you pass something else like 'name' then the tags and items will be something like this:
+
+```javascript
+{
+  "root": false,
+  "childrenTags": [],
+  "tagName": "Drama",
+  "items": [
+    "1000"
+  ],
+  "name": "110"   // this is the identifier of this tag with property name of 'name'
+}
+```
+
+instead of this:
+
+```javascript
+{
+  "root": false,
+  "childrenTags": [],
+  "tagName": "Drama",
+  "items": [
+    "1000"
+  ],
+  "id": "110"   // this is the identifier of this tag with property name of 'id'
+}
+```
+
 ---
 
 ## Tagger APIs
