@@ -127,6 +127,12 @@ await tagger.insertTag(clusterID, tagName, tagID, parent, root);
 
 ## Delete tag
 
+Call this function for deleting any tag specified by its id and its cluster.
+
+```javascript
+await tagger.deleteTag(clusterID, tagIdToDelete);
+```
+
 ---
 
 ## Insert new item
