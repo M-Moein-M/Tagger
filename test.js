@@ -53,6 +53,10 @@ async function test() {
 
   // error testing
   await tagger.insertItem(database[0].clusterID, '1002', 'unknownTag');
+
+  // testing retrieving item's tag
+  const retTags = await tagger.retrieveTags(database[0].clusterID, '1000');
+  console.log(retTags);
 }
 
 test();
