@@ -162,3 +162,9 @@ await tagger.deleteItem(clusterID, itemID);
 ---
 
 ## Print cluster
+
+A naive way to display the cluster tags level by level. It may help for debugging but it definitely can be improved.
+
+```javascript
+await tagger.printTags(clusterID);
+```
