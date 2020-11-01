@@ -389,6 +389,17 @@ class Tagger extends EventEmitter {
         throw error;
       }
     }
+
+    this.retrieveTags = async function (clusterID, itemID) {
+      const cluster = await getDocByID(clusterID);
+      const item = cluster.Items.find((item) => item.id === itemID);
+
+      // if item is not found
+      if (item == undefined) {
+        const description = 'Error Description: \n\t==>No item was found with such id';
+        this.emit('error', new Error('Invalid id'), description);
+      } else return item.tags;
+    };
   }
 }
 
