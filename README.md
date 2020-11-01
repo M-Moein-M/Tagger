@@ -151,6 +151,14 @@ await tagger.insertItem(clusterID, itemID, tagIdToAttachTo);
 
 ## Delete item
 
+Removing item itself and update all the tags so that all the references to the item are cleared.
+
+Two arguments are needed. The **clusterID** is the id of the cluster we want to remove the item from. The **itemID** is the id of the item that is going to be removed.
+
+```javascript
+await tagger.deleteItem(clusterID, itemID);
+```
+
 ---
 
 ## Print cluster
