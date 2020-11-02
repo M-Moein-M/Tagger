@@ -390,9 +390,10 @@ class Tagger extends EventEmitter {
       }
     }
 
+    // retrieves all the tags for specific item
     this.retrieveTags = async function (clusterID, itemID) {
       const cluster = await getDocByID(clusterID);
-      const item = cluster.Items.find((item) => item.id === itemID);
+      const item = cluster.Items.find((item) => item[itemUniqueIdentifier] === itemID);
 
       // if item is not found
       if (item == undefined) {
