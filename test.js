@@ -57,6 +57,10 @@ async function test() {
   // testing retrieving item's tag
   const retTags = await tagger.retrieveTags(database[0].clusterID, '1000');
   console.log(retTags);
+
+  // testing retrieving tag's items
+  const retItems = await tagger.retrieveItems(database[0].clusterID, '100');
+  console.log(retItems);
 }
 
 test();
