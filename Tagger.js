@@ -93,24 +93,29 @@ class Tagger extends EventEmitter {
         const newItemTags = [];
 
         const cluster = await getDocByID(clusterID);
-        let tag = getTag(cluster, tagUniqueIdentifier, tagID);
 
-        const stack = [];
-        stack.push(tag);
+        // keep track of which tag are we processing now
+        let loopTagID = tagID;
 
-        // Traversing tags tree
-        while (stack.length > 0) {
-          const top = stack.pop();
-          top.items.push(itemID);
+        // Traversing tags tree upwards towards the root
+        while (true) {
+          // if reached the parent of the root(which is null) then break the while
+          if (loopTagID === null) {
+            break;
+          }
+
+          const tag = getTag(cluster, tagUniqueIdentifier, loopTagID);
+
+          // add new item to list of items of the tag
+          tag.items.push(itemID);
 
           // push tag id so we've all the tags for new item in the end of the loop
-          newItemTags.push(top[tagUniqueIdentifier]);
+          newItemTags.push(tag[tagUniqueIdentifier]);
 
-          updateTag(cluster, top[tagUniqueIdentifier], { items: top.items }, false);
+          await updateTag(cluster, tag[tagUniqueIdentifier], { items: [...tag.items] }, false);
 
-          for (let i = 0; i < top.childrenTags.length; i++) {
-            stack.push(getTag(cluster, tagUniqueIdentifier, top.childrenTags[i]));
-          }
+          // update the loopTagID so that we update the parent
+          loopTagID = tag.parent;
         }
 
         const newItem = { tags: newItemTags, id: itemID };
