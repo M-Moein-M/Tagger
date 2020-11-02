@@ -401,6 +401,18 @@ class Tagger extends EventEmitter {
         this.emit('error', new Error('Invalid id'), description);
       } else return item.tags;
     };
+
+    // retrieve all the items for specific tag
+    this.retrieveItems = async function (clusterID, tagID) {
+      const cluster = await getDocByID(clusterID);
+      const tag = cluster.Tags.find((tag) => tag[tagUniqueIdentifier] === tagID);
+
+      // if no tag was found
+      if (tag == undefined) {
+        const description = 'Error Description: \n\t==>No tag was found with such id';
+        this.emit('error', new Error('Invalid id'), description);
+      } else return tag.items;
+    };
   }
 }
 
