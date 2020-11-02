@@ -212,8 +212,9 @@ class Tagger extends EventEmitter {
           // get root of the cluster
           const root = getTag(cluster, 'root', true);
 
-          // if root was found
-          if (root) await updateTag(cluster, root[tagUniqueIdentifier], { root: false }, false);
+          // if there's a root already update it
+          // change previous root to a simple node in tree(previous root is child of new root)
+          if (root) await updateTag(cluster, root[tagUniqueIdentifier], { root: false, parent: tagID }, false);
 
           // insert new root. No need to refresh the database since we do it in saveNewTag couple of lines below
           await saveNewTag(cluster, {
@@ -221,6 +222,7 @@ class Tagger extends EventEmitter {
             childrenTags: root ? [root[tagUniqueIdentifier]] : [],
             tagName: tagName,
             items: root ? [...root.items] : [],
+            parent: null, // no parent for root
             id: tagID,
           });
         } else {
@@ -237,6 +239,7 @@ class Tagger extends EventEmitter {
             childrenTags: [],
             tagName: tagName,
             items: [],
+            parent: attachToID, // set parent
             id: tagID,
           });
         }
