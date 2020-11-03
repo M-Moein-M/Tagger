@@ -163,10 +163,20 @@ await tagger.deleteItem(clusterID, itemID);
 
 ## Retrieve tags
 
-This function is used to get all the tags related to an specific item
+This function is used to get all the tags related to an specific item.
 
 ```javascript
 const retTags = await tagger.retrieveTags(clusterID, itemID);
+```
+
+---
+
+## Retrieve items
+
+This function is used to get all the items related to an specific tag.
+
+```javascript
+const retItems = await tagger.retrieveItems(clusterID, tagID);
 ```
 
 ---
