@@ -147,6 +147,8 @@ The third parameter is the tag id that new item is gonna be attached to. If the 
 await tagger.insertItem(clusterID, itemID, tagIdToAttachTo);
 ```
 
+**Note** that inserting new item to a specific tag will add the item to the tag and all of its parents. For example if tagA is parent of tagB and tagC, on inserting new item to tagB, the inserted item will be added to items of tagB and tagA(parent)
+
 ---
 
 ## Delete item
