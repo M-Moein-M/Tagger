@@ -183,6 +183,16 @@ const retItems = await tagger.retrieveItems(clusterID, tagID);
 
 ---
 
+## Retrieve children of a tag
+
+This function is used to get children of a specific tag. The function wil return the tag's children as an array of their IDs.
+
+```javascript
+const children = await tagger.retrieveChildrenTags(clusterID, tagID);
+```
+
+---
+
 ## Print cluster
 
 A naive way to display the cluster tags level by level. It may help for debugging but it definitely can be improved.
