@@ -421,6 +421,14 @@ class Tagger extends EventEmitter {
         this.emit('error', new Error('Invalid id'), description);
       } else return tag.items;
     };
+
+    // retrieve children tags
+    this.retrieveChildrenTags = async function (clusterID, tagID) {
+      const cluster = await getDocByID(clusterID);
+      const tag = getTag(cluster, tagUniqueIdentifier, tagID);
+      const children = tag.childrenTags;
+      return children;
+    };
   }
 }
 
