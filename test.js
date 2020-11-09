@@ -3,7 +3,7 @@ const Tagger = require('./Tagger');
 const database = [];
 
 // insert new document to database
-function insertDoc(doc) {
+function insertDoc(doc, docID) {
   database.push(doc);
 }
 

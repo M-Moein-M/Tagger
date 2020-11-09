@@ -26,10 +26,10 @@ const tagger = new Tagger(insertDoc, updateDoc, getDocByID, tagUniqueIdentifier,
 
 As we told, user must implement the functions below for initializing the Tagger.
 
-- **insertDoc** is the function that will be used for saving the tags clusters(the whole tags and items) to the database. The implementation should be as follows:
+- **insertDoc** is the function that will be used for saving the tags clusters(the whole tags and items) to the database with the passed in newDocumentID. The implementation should be as follows:
 
 ```javascript
-function insertDoc(newDocument) {
+function insertDoc(newDocument, newDocumentID) {
   // your code which saves the newDocument into the database
 }
 ```

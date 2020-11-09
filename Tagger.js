@@ -1,5 +1,4 @@
 const EventEmitter = require('events');
-const { errorMonitor } = require('stream');
 
 class Tagger extends EventEmitter {
   constructor(insertDoc, updateDoc, getDocByID, tagUniqueIdentifier = 'id', itemUniqueIdentifier = 'id') {
@@ -17,7 +16,7 @@ class Tagger extends EventEmitter {
           clusterID: clusterID,
         };
 
-        await insertDoc(cluster);
+        await insertDoc(cluster, cluster.clusterID);
 
         return clusterID;
       } catch (error) {
