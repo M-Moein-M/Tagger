@@ -84,19 +84,22 @@ class Tagger extends EventEmitter {
     // handling item insertion
     this.insertItems = async function (clusterID = null, itemIDs = null, tagID = null) {
       try {
-        // check for valid itemID and tagID
-        if (itemID === null) throw new Error('Null itemID');
+        // check for valid itemIDs and tagID
+        if (itemIDs === null) throw new Error('Null itemIDs');
         else if (tagID === null) throw new Error('Null TagID');
         else if (clusterID === null) throw new Error('Null clusterID');
 
-        const newItemTags = [];
+        // keep track of each of the item's tags. This will be used to create new item
+        const newItemsTags = {};
 
         const cluster = await getDocByID(clusterID);
 
         // keep track of which tag are we processing now
         let loopTagID = tagID;
 
+        // handling tags of the new items
         // Traversing tags tree upwards towards the root
+
         while (true) {
           // if reached the parent of the root(which is null) then break the while
           if (loopTagID === null) {
@@ -107,14 +110,23 @@ class Tagger extends EventEmitter {
 
           // add new items to list of items of the tag
           for (let itmCount = 0; itmCount < itemIDs.length; itmCount++) {
+            const itemID = itemIDs[itmCount];
+
             // skip if item does already exists
-            if (tags.items.includes(itemIDs[itmCount])) continue;
+            if (tag.items.includes(itemID)) continue;
 
-            tag.items.push(itemIDs[itmCount]);
+            // insert new item to the tag
+            tag.items.push(itemID);
+
+            // list this tag for itemID
+            // to insert a tag for the first time we need an initialization
+            if (newItemsTags[itemID] === undefined) {
+              newItemsTags[itemID] = [];
+            }
+
+            // push tag id so we've all the tags for new item in the end of the loop
+            newItemsTags[itemID].push(tag[tagUniqueIdentifier]);
           }
-
-          // push tag id so we've all the tags for new item in the end of the loop
-          newItemTags.push(tag[tagUniqueIdentifier]);
 
           await updateTag(cluster, tag[tagUniqueIdentifier], { items: [...tag.items] }, false);
 
@@ -122,8 +134,19 @@ class Tagger extends EventEmitter {
           loopTagID = tag.parent;
         }
 
-        const newItem = { tags: newItemTags, id: itemID };
-        cluster.Items.push(newItem);
+        // handling saving of new items
+        for (let item in newItemsTags) {
+          const itemIndex = getItemIndex(cluster, item);
+          // if the item is not in cluster
+          if (itemIndex === -1) {
+            const newItem = { tags: newItemsTags[item], id: item };
+            cluster.Items.push(newItem);
+          } else {
+            // add new tags to the existing item in cluster
+            cluster.Items[itemIndex] = cluster.Items[itemIndex].tags.concat(newItemsTags[item]);
+          }
+        }
+
         await updateDoc(cluster.clusterID, cluster);
       } catch (error) {
         const description = 'Error Description: \n\t==>Inserting new item failed';

@@ -29,6 +29,7 @@ async function test() {
 
   tagger.on('error', (error, dsc) => {
     console.log(dsc);
+    console.error(error);
   });
 
   await tagger.createNewCluster('rt64q57scg0');
