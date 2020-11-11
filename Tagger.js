@@ -82,7 +82,7 @@ class Tagger extends EventEmitter {
     };
 
     // handling item insertion
-    this.insertItem = async function (clusterID = null, itemID = null, tagID = null) {
+    this.insertItems = async function (clusterID = null, itemIDs = null, tagID = null) {
       try {
         // check for valid itemID and tagID
         if (itemID === null) throw new Error('Null itemID');
@@ -105,8 +105,13 @@ class Tagger extends EventEmitter {
 
           const tag = getTag(cluster, tagUniqueIdentifier, loopTagID);
 
-          // add new item to list of items of the tag
-          tag.items.push(itemID);
+          // add new items to list of items of the tag
+          for (let itmCount = 0; itmCount < itemIDs.length; itmCount++) {
+            // skip if item does already exists
+            if (tags.items.includes(itemIDs[itmCount])) continue;
+
+            tag.items.push(itemIDs[itmCount]);
+          }
 
           // push tag id so we've all the tags for new item in the end of the loop
           newItemTags.push(tag[tagUniqueIdentifier]);
@@ -160,7 +165,7 @@ class Tagger extends EventEmitter {
         }
 
         // return tag matching given identifier
-        if (property === 'id') return getTagByID(cluster, value);
+        if (property === tagUniqueIdentifier) return getTagByID(cluster, value);
 
         // throw error if requested property is invalid
         throw new Error(`No property such as ${property}`);

@@ -38,9 +38,9 @@ async function test() {
   await tagger.insertTag(database[0].clusterID, 'Comedy', '103', '100', false);
   await tagger.insertTag(database[0].clusterID, 'American', '104', '103', false);
 
-  await tagger.insertItem(database[0].clusterID, '1000', '100');
-  await tagger.insertItem(database[0].clusterID, '1001', '103');
-  await tagger.insertItem(database[0].clusterID, '1002', '105');
+  await tagger.insertItems(database[0].clusterID, ['1000'], '100');
+  await tagger.insertItems(database[0].clusterID, ['1001'], '103');
+  await tagger.insertItems(database[0].clusterID, ['1002'], '105');
 
   console.log('- - - - - - - - - - \n', JSON.stringify(database));
   //tagger.printTags(database[0].clusterID);
@@ -52,7 +52,7 @@ async function test() {
   await tagger.printTags(database[0].clusterID);
 
   // error testing
-  await tagger.insertItem(database[0].clusterID, '1002', 'unknownTag');
+  await tagger.insertItems(database[0].clusterID, ['1002'], 'unknownTag');
 
   // testing retrieving item's tag
   const retTags = await tagger.retrieveTags(database[0].clusterID, '1000');
