@@ -256,15 +256,6 @@ class Tagger extends EventEmitter {
     // return requested item with same identifier as itemID
     function getItemIndex(cluster, itemID) {
       const index = cluster.Items.findIndex((i) => i[itemUniqueIdentifier] === itemID);
-
-      // item was not found
-      if (index < -1) {
-        const description = 'Error Description: \n\t==>Retrieving item failed. No item with such id';
-        const error = new Error('Retrieving item failed');
-        this.emit('error', error, description);
-        throw error;
-      }
-
       return index;
     }
 
@@ -272,6 +263,12 @@ class Tagger extends EventEmitter {
       try {
         const cluster = await getDocByID(clusterID);
         const itemIndex = getItemIndex(cluster, itemID);
+
+        // if item was not found
+        if (itemIndex < -1) {
+          const error = new Error('Item with such identifier was not found');
+          throw error;
+        }
 
         const item = cluster.Items[itemIndex];
 
