@@ -33,8 +33,6 @@ class Tagger extends EventEmitter {
         for (let i = 0, id = ''; i < order; i++) id += Math.floor(Math.random() * 60466175).toString(36);
         return id;
       } catch (error) {
-        const description = 'Error Description: \n\t==>Generating new cluster id failed';
-        this.emit('error', error, description);
         // pass the error to a caller function
         throw error;
       }
@@ -172,8 +170,7 @@ class Tagger extends EventEmitter {
         }
         if (reloadDatabase) await updateDoc(cluster.clusterID, cluster);
       } catch (error) {
-        const description = 'Error Description: \n\t==>Updating tag Failed';
-        this.emit('error', error, description);
+        // pass the error the the caller
         throw error;
       }
     }
@@ -193,8 +190,8 @@ class Tagger extends EventEmitter {
         // throw error if requested property is invalid
         throw new Error(`No property such as ${property}`);
       } catch (error) {
-        const description = 'Error Description: \n\t==>Retrieving tag failed';
-        this.emit('error', error, description);
+        // pass the error the the caller
+        throw error;
       }
 
       // return tag with required identifier
@@ -204,9 +201,8 @@ class Tagger extends EventEmitter {
 
         // failed to find tag
         if (!tag) {
-          const description = 'Error Description: \n\t==>Finding tag failed';
+          // pass the error the the caller
           const error = new Error('No tag found with such id');
-          this.emit('error', error, description);
           throw error;
         }
 
@@ -229,8 +225,6 @@ class Tagger extends EventEmitter {
         cluster.Tags.push(newTag);
         await updateDoc(cluster.clusterID, cluster);
       } catch (error) {
-        const description = 'Error Description: \n\t==>Saving new tag failed';
-        this.emit('error', error, description);
         throw error;
       }
     }
@@ -416,8 +410,7 @@ class Tagger extends EventEmitter {
 
         await updateDoc(cluster.clusterID, cluster);
       } catch (error) {
-        const description = 'Error Description: \n\t==>Clearing tag from cluster failed';
-        this.emit('error', error, description);
+        // pass the error to the caller
         throw error;
       }
     }
