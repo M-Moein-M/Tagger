@@ -208,3 +208,16 @@ A naive way to display the cluster tags level by level. It may help for debuggin
 ```javascript
 await tagger.printTags(clusterID);
 ```
+
+---
+
+## Error handling
+
+All the errors will be caught and emitted to Tagger error event. Some description will be passed through to describe the general reason for the error.
+
+```javascript
+tagger.on('error', (error, dsc) => {
+  console.log(dsc); // print the description of the error
+  console.error(error); // print the error object it self.
+});
+```
