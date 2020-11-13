@@ -143,19 +143,19 @@ await tagger.deleteTag(clusterID, tagIdToDelete);
 
 ---
 
-## Insert new item
+## Insert new items
 
 The first parameter is the cluster id.
 
-The second parameter is the item id. the only way to specify the items to Tagger is with their id and the value of the item and other properties of the item (of course) is not Tagger's to manage.
+The second parameter is a array of items identifiers to insert to new tag. The only way to specify the items to Tagger is with their id and the value of the item and other properties of the item (of course) is not Tagger's to manage.
 
-The third parameter is the tag id that new item is gonna be attached to. If the tag has any children tags(sub tags), new item will be added to those as well.
-
-```javascript
-await tagger.insertItem(clusterID, itemID, tagIdToAttachTo);
-```
+The third parameter is the tag id that new item is gonna be attached to.
 
 **Note** that inserting new item to a specific tag will add the item to the tag and all of its parents. For example if tagA is parent of tagB and tagC, on inserting new item to tagB, the inserted item will be added to items of tagB and tagA(parent)
+
+```javascript
+await tagger.insertItem(clusterID, itemsID, tagIdToAttachTo);
+```
 
 ---
 
