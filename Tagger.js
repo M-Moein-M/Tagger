@@ -446,6 +446,11 @@ class Tagger extends EventEmitter {
       const children = tag.childrenTags;
       return children;
     };
+
+    this.createAndInsert = async function (clusterID, tagSequence, itemIDs) {
+      // loading cluster
+      const cluster = await getDocByID(clusterID);
+    };
   }
 }
 
