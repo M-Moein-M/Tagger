@@ -223,7 +223,6 @@ class Tagger extends EventEmitter {
     async function saveNewTag(cluster, newTag) {
       try {
         cluster.Tags.push(newTag);
-        await updateDoc(cluster.clusterID, cluster);
       } catch (error) {
         throw error;
       }
@@ -233,47 +232,59 @@ class Tagger extends EventEmitter {
     // inserting new tag, if root is true then new tag will be the parent of the current root
     this.insertTag = async function (clusterID, tagName = null, tagID = null, attachToID = null, root = false) {
       try {
-        const cluster = await getDocByID(clusterID);
-        if (root) {
-          // get root of the cluster
-          const root = getTag(cluster, 'root', true);
+        let cluster = await getDocByID(clusterID);
 
-          // if there's a root already update it
-          // change previous root to a simple node in tree(previous root is child of new root)
-          if (root) await updateTag(cluster, root[tagUniqueIdentifier], { root: false, parent: tagID }, false);
+        // add new tag to cluster
+        cluster = await insertTagToCluster(cluster, tagName, tagID, attachToID, root);
 
-          // insert new root. No need to refresh the database since we do it in saveNewTag couple of lines below
-          await saveNewTag(cluster, {
-            root: true,
-            childrenTags: root ? [root[tagUniqueIdentifier]] : [],
-            tagName: tagName,
-            items: root ? [...root.items] : [],
-            parent: null, // no parent for root
-            id: tagID,
-          });
-        } else {
-          // retrieve the tag that we want to append to
-          const attachTag = getTag(cluster, tagUniqueIdentifier, attachToID);
-
-          // insert new children tag. No need to refresh the database since we do it in saveNewTag couple of lines below
-          attachTag.childrenTags.push(tagID);
-          await updateTag(cluster, attachToID, { childrenTags: attachTag.childrenTags }, false);
-
-          // save new tag to cluster
-          await saveNewTag(cluster, {
-            root: false,
-            childrenTags: [],
-            tagName: tagName,
-            items: [],
-            parent: attachToID, // set parent
-            id: tagID,
-          });
-        }
+        // update and save changed cluster to database
+        await updateDoc(cluster.clusterID, cluster);
       } catch (error) {
         const description = 'Error Description: \n\t==>Inserting new tag failed';
         this.emit('error', error, description);
       }
     };
+
+    // inserts the tag to given cluster and returns the cluster
+    async function insertTagToCluster(cluster, tagName = null, tagID = null, attachToID = null, root = false) {
+      if (root) {
+        // get root of the cluster
+        const root = getTag(cluster, 'root', true);
+
+        // if there's a root already update it
+        // change previous root to a simple node in tree(previous root is child of new root)
+        if (root) await updateTag(cluster, root[tagUniqueIdentifier], { root: false, parent: tagID }, false);
+
+        // insert new root. No need to refresh the database since we do it in saveNewTag couple of lines below
+        await saveNewTag(cluster, {
+          root: true,
+          childrenTags: root ? [root[tagUniqueIdentifier]] : [],
+          tagName: tagName,
+          items: root ? [...root.items] : [],
+          parent: null, // no parent for root
+          id: tagID,
+        });
+      } else {
+        // retrieve the tag that we want to append to
+        const attachTag = getTag(cluster, tagUniqueIdentifier, attachToID);
+
+        // insert new children tag. No need to refresh the database since we do it in saveNewTag couple of lines below
+        attachTag.childrenTags.push(tagID);
+        await updateTag(cluster, attachToID, { childrenTags: attachTag.childrenTags }, false);
+
+        // save new tag to cluster
+        await saveNewTag(cluster, {
+          root: false,
+          childrenTags: [],
+          tagName: tagName,
+          items: [],
+          parent: attachToID, // set parent
+          id: tagID,
+        });
+      }
+
+      return cluster;
+    }
 
     // return requested item with same identifier as itemID
     function getItemIndex(cluster, itemID) {
