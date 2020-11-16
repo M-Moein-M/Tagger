@@ -458,9 +458,19 @@ class Tagger extends EventEmitter {
       return children;
     };
 
-    this.createAndInsert = async function (clusterID, tagSequence, itemIDs) {
+    this.createAndInsert = async function (clusterID, tagIDList, tagNameList = [], attachToID, itemIDList) {
       // loading cluster
-      const cluster = await getDocByID(clusterID);
+      let cluster = await getDocByID(clusterID);
+
+      // the tag that next tagID will be attached to
+      let currentTag = attachToID;
+      for (let i = 0; i < tagIDList.length; i++) {
+        cluster = await insertTagToCluster(cluster, tagNameList[i], tagIDList[i], currentTag, false);
+
+        // update value of currentTag for next iteration
+        currentTag = tagIDList[i];
+      }
+      // insert items to the last tag in tagIDList
     };
   }
 }
