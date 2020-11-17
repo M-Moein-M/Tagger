@@ -488,7 +488,9 @@ class Tagger extends EventEmitter {
         currentTag = tagIDList[i];
       }
       // insert items to the last tag in tagIDList
-      // handle inserting item without re-loading cluster from database
+      cluster = insertItemsToCluster(cluster, itemIDList, currentTag);
+      // save cluster to database
+      await updateDoc(cluster.clusterID, cluster);
     };
   }
 }
