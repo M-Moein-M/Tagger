@@ -465,12 +465,19 @@ class Tagger extends EventEmitter {
       // the tag that next tagID will be attached to
       let currentTag = attachToID;
       for (let i = 0; i < tagIDList.length; i++) {
-        cluster = await insertTagToCluster(cluster, tagNameList[i], tagIDList[i], currentTag, false);
+        cluster = await insertTagToCluster(
+          cluster,
+          tagNameList[i] ? tagNameList[i] : '',
+          tagIDList[i],
+          currentTag,
+          false
+        );
 
         // update value of currentTag for next iteration
         currentTag = tagIDList[i];
       }
       // insert items to the last tag in tagIDList
+      // handle inserting item without re-loading cluster from database
     };
   }
 }
