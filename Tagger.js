@@ -87,10 +87,21 @@ class Tagger extends EventEmitter {
         else if (tagID === null) throw new Error('Null TagID');
         else if (clusterID === null) throw new Error('Null clusterID');
 
+        let cluster = await getDocByID(clusterID);
+
+        cluster = await insertItemsToCluster(cluster, itemIDs, tagID);
+
+        await updateDoc(cluster.clusterID, cluster);
+      } catch (error) {
+        const description = 'Error Description: \n\t==>Inserting new item failed';
+        this.emit('error', error, description);
+      }
+    };
+
+    async function insertItemsToCluster(cluster, itemIDs, tagID) {
+      try {
         // keep track of each of the item's tags. This will be used to create new item
         const newItemsTags = {};
-
-        const cluster = await getDocByID(clusterID);
 
         // keep track of which tag are we processing now
         let loopTagID = tagID;
@@ -145,12 +156,12 @@ class Tagger extends EventEmitter {
           }
         }
 
-        await updateDoc(cluster.clusterID, cluster);
+        // return updated cluster
+        return cluster;
       } catch (error) {
-        const description = 'Error Description: \n\t==>Inserting new item failed';
-        this.emit('error', error, description);
+        throw error;
       }
-    };
+    }
 
     // change the tag properties according to valueChange input and save to database
     async function updateTag(cluster, tagID, valueChange, reloadDatabase = true) {
