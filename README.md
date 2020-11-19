@@ -175,6 +175,29 @@ await tagger.deleteItem(clusterID, itemID);
 
 ---
 
+## Create and insert
+
+This function is used to add multiple tags at once and add list of items to all of those tags. This function is a mix of insertTags and insertItems functions.
+
+consider snippet below...
+
+```javascript
+const listOfTagsId = ['201', '202', '203']; // list of the tags you want to insert one by on
+const listOfTagsName = ['test1', 'test2', 'test3']; // list of names is optional
+const listOfItemsId = ['2000', '2001']; // list of items you want to add to newly inserted tags
+const attachToID = '200';
+
+await tagger.createAndInsert(clusterID, listOfTagsId, listOfTagsName, attachToID, listOfItemsId);
+```
+
+All the tags provided in listOfTagsId will be added one by one to the cluster. The first tag(201) will be added to attachToID tag. The second tag will be added to the first tag in listOfTagsId and, the third tag will be added to the second tag in listOfTagsId and so on.
+
+At last the list of items will be added to final tag and all its parents(as discussed in insertItems).
+
+The advantage of this function is that it reduces the number of database calls in case of inserting multiple tags.
+
+---
+
 ## Retrieve tags
 
 This function is used to get all the tags related to an specific item.
