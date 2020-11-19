@@ -488,7 +488,7 @@ class Tagger extends EventEmitter {
         currentTag = tagIDList[i];
       }
       // insert items to the last tag in tagIDList
-      cluster = insertItemsToCluster(cluster, itemIDList, currentTag);
+      cluster = await insertItemsToCluster(cluster, itemIDList, currentTag);
       // save cluster to database
       await updateDoc(cluster.clusterID, cluster);
     };

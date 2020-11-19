@@ -62,6 +62,16 @@ async function test() {
   // testing retrieving tag's items
   const retItems = await tagger.retrieveItems(database[0].clusterID, '100');
   console.log(retItems);
+
+  // testing createAndInsert
+  const listOfTagsId = ['200', '201', '202'];
+  const listOfTagsName = ['test1', 'test2', 'test3']; // list of names is optional
+  const listOfItemsId = ['2000', '2001'];
+
+  console.log('\n\n');
+  console.log('- - - - - BEFORE INSERT AND CREATE FUNCTION - - - - - \n', JSON.stringify(database));
+  await tagger.createAndInsert(database[0].clusterID, listOfTagsId, listOfTagsName, '103', listOfItemsId);
+  console.log('- - - - - AFTER INSERT AND CREATE FUNCTION - - - - - \n', JSON.stringify(database));
 }
 
 test();
