@@ -2,21 +2,21 @@
 
 ## Intro
 
-An application for tagging images or notes or other entities only with their unique ID. The demo of project can be seen below. Each box represents the item you want to tag. Given an item ID will return the tags related to that ID and given a tag will return all the ID's related to that tag.
+A module for tagging images or notes or other entities only with their unique ID.
 
-## The main idea
+## Main idea
 
 The figure below is a demonstration of what Tagger is capable of and whether it can solve your problems or not.
 
 Consider this tree shape graph. Each node(tag) has a name and a list of items(the actual movies related to that node). Each node(tag) specifies the items that relate to that node. As we go down through the tree, tags and their items get more specific. For example, the root tag has all the movies in the tree since every drama British movie is a movie in the first place.
 
-However, in Tagger the names of the movies and the node's name are will be replaced by some id that is provided when creating new item or tag.
+However, in Tagger the names of the movies, and genres will be replaced by some unique id that is provided when creating a new item or tag.
 
 <img src="https://i.ibb.co/HTNnt4K/tagTree.png"/>
 
 # Tagger initialization
 
-For storing tags and items related to them, we need a database. Leaving this to the module user to implement the functions that are related to storing and changing from database. So the users can use any database they like but they should do some dirty work to make the functions for Tagger to work with(Tagger might implement an default database for users).
+A database is needed for storing tags and items. Left this to users of this module to implement the functions that are related to changing the part of the database that is related to storing Tagger clusters. So that the programmer can use any database they like. But, the programmer should implement the methods necessary for the Tagger functionality.
 
 ## User dirty work
 
